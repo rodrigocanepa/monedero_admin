@@ -1,0 +1,83 @@
+{
+  "project_info": {
+    "project_number": "218035536320",
+    "firebase_url": "https://mega-monedero.firebaseio.com",
+    "project_id": "mega-monedero",
+    "storage_bucket": "mega-monedero.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:218035536320:android:ee4edf11c0b53e80288825",
+        "android_client_info": {
+          "package_name": "com.apps.scode.mega_monedero"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "218035536320-8v4ou5reev4dk018hko81clcb73km182.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLfZdqB_VWbF6F8xrWkrmaxufVyNfeJnA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "218035536320-8v4ou5reev4dk018hko81clcb73km182.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "218035536320-1lnhcvt741448rifkdpklsurrh1kum14.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.apps.scode.megaMonedero"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:218035536320:android:6921ba2a668ac3c6288825",
+        "android_client_info": {
+          "package_name": "com.apps.scode.monedero_admin"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "218035536320-8v4ou5reev4dk018hko81clcb73km182.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDLfZdqB_VWbF6F8xrWkrmaxufVyNfeJnA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "218035536320-8v4ou5reev4dk018hko81clcb73km182.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "218035536320-1lnhcvt741448rifkdpklsurrh1kum14.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.apps.scode.megaMonedero"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

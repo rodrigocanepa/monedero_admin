@@ -1,5 +1,13 @@
+import 'package:clippy_flutter/diagonal.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:monedero_admin/Firebase/authentication.dart';
+import 'package:monedero_admin/Firebase/querys.dart';
+import 'package:monedero_admin/Models/adminModel.dart';
 import 'package:monedero_admin/Screens/mainScreen.dart';
+import 'package:monedero_admin/MyColors/Colors.dart' as MyColors;
+import 'package:toast/toast.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -9,138 +17,320 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
 
   double height;
+  TextEditingController _emailController;
+  TextEditingController _passwordController;
+  bool _showSpinner = false;
+  List<AdminModel> usuarios = [];
+
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+    _emailController = TextEditingController();
+    _passwordController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+
+    _emailController.dispose();
+    _passwordController.dispose();
+  }
+
 
   @override
   Widget build(BuildContext context) {
-
     height = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
-          height: height,
-          child: Center(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisSize: MainAxisSize.min,
-              children: <Widget>[
-                Text(
-                  "Iniciar Sesión",
-                  style: TextStyle(
-                    fontSize: 26.0,
-                    fontWeight: FontWeight.bold
-                  ),
-                  textAlign: TextAlign.center,
+      body: ModalProgressHUD(
+        inAsyncCall: _showSpinner,
+        child: SingleChildScrollView(
+          child: Stack(
+            children: <Widget>[
+              Container(
+                height: height,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                      colors: [MyColors.Colors.colorBackgroundDark, MyColors.Colors.colorBackgroundLight],
+                      end: FractionalOffset.topCenter,
+                      begin: FractionalOffset.bottomCenter,
+                      stops: [0.0, 1.0],
+                      tileMode: TileMode.repeated),
                 ),
-                Text(
-                  "Mega Monedero Administrador",
-                  style: TextStyle(
-                      fontSize: 16.0,
-                      fontWeight: FontWeight.bold
+              ),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Stack(
+                    children: <Widget>[
+                      Diagonal(
+                        clipShadows: [ClipShadow(color: Colors.black)],
+                        position: DiagonalPosition.BOTTOM_LEFT,
+                        clipHeight: height/15,
+                        child: Container(
+                          color: MyColors.Colors.colorBackgroundDark,
+                          height: height/3.5,
+                        ),
+                      ),
+                      Container(
+                        height: height/3.5,
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: <Widget>[
+                              Text(
+                                "MEGA MONEDERO",
+                                style: TextStyle(
+                                    fontSize: 28.0,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold
+                                ),
+                              ),
+                              Text(
+                                "Administrador",
+                                style: TextStyle(
+                                    fontSize: 18.0,
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    ],
                   ),
-                  textAlign: TextAlign.center,
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 40.0, left: 40.0, right: 40.0),
-                  child: Text(
-                    "Correo electrónico",
+                  SizedBox(height: 15.0),
+                  Text(
+                    "INICIAR SESIÓN",
                     style: TextStyle(
-                        fontSize: 18.0,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 40.0, right: 40.0),
-                  child: TextFormField(
-                    textInputAction: TextInputAction.done,
-                    //controller: _passwordController,
-                    //obscureText: true,
-                    style: TextStyle(
-                        fontFamily: 'Futura',
-                        //color: ColoresApp.Colores.colorGrisClaro
-                    ),
-                    decoration: InputDecoration(
-                        hintText: "ejemplo@gmail.com",
-                        //border: InputBorder.none,
-                        hintStyle: TextStyle(
-                            fontFamily: 'Futura',
-                            //color: ColoresApp.Colores.colorGrisClaro
-                        )
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 20.0, left: 40.0, right: 40.0),
-                  child: Text(
-                    "Contraseña",
-                    style: TextStyle(
-                        fontSize: 18.0,
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 40.0, right: 40.0),
-                  child: TextFormField(
-                    textInputAction: TextInputAction.done,
-                    //controller: _passwordController,
-                    obscureText: true,
-                    style: TextStyle(
-                      fontFamily: 'Futura',
-                      //color: ColoresApp.Colores.colorGrisClaro
-                    ),
-                    decoration: InputDecoration(
-                        //hintText: "ejemplo@gmail.com",
-                        //border: InputBorder.none,
-                        hintStyle: TextStyle(
-                          fontFamily: 'Futura',
-                          //color: ColoresApp.Colores.colorGrisClaro
-                        )
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 20.0, right: 40.0),
-                  child: Text(
-                    "¿Olvidaste tu contraseña?",
-                    style: TextStyle(
+                        fontSize: 26.0,
+                        color: Colors.white,
                         fontWeight: FontWeight.bold
                     ),
-                    textAlign: TextAlign.end,
+                    textAlign: TextAlign.center,
                   ),
-                ),
-                GestureDetector(
-                  onTap: (){
-                    Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => MainScreen()
-                        )
-                    );
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.only(top:25.0, left: 40.0, right: 40.0),
+                  SizedBox(height: 25.0),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 40.0, right: 40.0),
                     child: Container(
-                      height: 40.0,
-                      decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(20.0),
-                        color: Colors.blue,
+                        height: 42.0,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30.0),
+                          border: Border.all(
+                            color: Colors.white,
+                          ),
+                        ),
+                        child: Row(
+                          children: <Widget>[
+                            SizedBox(
+                              width: 30.0,
+                            ),
+                            Expanded(
+                              child: TextFormField(
+                                textInputAction: TextInputAction.done,
+                                keyboardType: TextInputType.emailAddress,
+                                controller: _emailController,
+                                //obscureText: true,
+                                style: TextStyle(
+                                  fontFamily: 'Futura',
+                                  color: Colors.white,
+                                ),
+                                decoration: InputDecoration(
+                                    hintText: "Correo electrónico",
+                                    border: InputBorder.none,
+                                    hintStyle: TextStyle(
+                                      fontFamily: 'Futura',
+                                      color: Colors.white54,
+                                    )
+                                ),
+                              ),
+                            )
+                          ],
+                        )
+                    ),
+                  ),
+                  SizedBox(height: 15.0),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 40.0, right: 40.0),
+                    child: Container(
+                        height: 42.0,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30.0),
+                          border: Border.all(
+                            color: Colors.white,
+                          ),
+                        ),
+                        child: Row(
+                          children: <Widget>[
+                            SizedBox(
+                              width: 30.0,
+                            ),
+                            Expanded(
+                              child: TextFormField(
+                                textInputAction: TextInputAction.done,
+                                controller: _passwordController,
+                                obscureText: true,
+                                style: TextStyle(
+                                  fontFamily: 'Futura',
+                                  color: Colors.white,
+                                ),
+                                decoration: InputDecoration(
+                                    hintText: "Contraseña",
+                                    border: InputBorder.none,
+                                    hintStyle: TextStyle(
+                                      fontFamily: 'Futura',
+                                      color: Colors.white54,
+                                    )
+                                ),
+                              ),
+                            )
+                          ],
+                        )
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 20.0, right: 40.0),
+                    child: Text(
+                      "¿Olvidaste tu contraseña?",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold
                       ),
-                      child: Center(
-                        child: Text(
-                          "Entrar",
-                          style: TextStyle(
-                            color: Colors.white
+                      textAlign: TextAlign.end,
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: (){
+                      _loguearme();
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(top:20.0, left: 40.0, right: 40.0),
+                      child: Container(
+                        height: 45.0,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(20.0),
+                          color: MyColors.Colors.colorBackgroundDark,
+                        ),
+                        child: Center(
+                          child: Text(
+                            "ENTRAR",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold
+                            ),
                           ),
                         ),
                       ),
                     ),
                   ),
-                )
-              ],
-            ),
+                ],
+              ),
+            ],
           ),
         ),
       ),
     );
+  }
+
+  void setSpinnerStatus(bool status){
+    setState(() {
+      _showSpinner = status;
+    });
+  }
+
+  _loguearme() async {
+    FocusScope.of(context).requestFocus(FocusNode());
+
+    String email = _emailController.text.trim();
+    String contrasena = _passwordController.text.trim();
+
+    if(!email.contains("@") || email.length < 3 ){
+      Toast.show("Su correo no está escrito correctamente, por favor, verifíquelo", context, duration: Toast.LENGTH_LONG, gravity:  Toast.BOTTOM);
+      return;
+    }
+    if(contrasena.length < 6 ){
+      Toast.show("Su contraseña debe ser minimo de 6 caracteres, por favor, verifíquela", context, duration: Toast.LENGTH_LONG, gravity:  Toast.BOTTOM);
+      return;
+    }
+
+    setSpinnerStatus(true);
+    var auth = await Authentication().logingUser(email: _emailController.text.trim(), password: _passwordController.text.trim());
+
+    if(auth.succes){
+
+      FirebaseUser user = await Authentication().getCurrentUser();
+      _getMiInfo(user.uid);
+      /*
+                            Navigator.pushReplacementNamed(
+                                context,
+                                MainScreen.routeName);*/
+
+      //FocusScope.of(context).requestFocus(_focusNode);
+      _emailController.text = "";
+      _passwordController.text = "";
+    }
+    else{
+      Toast.show(auth.errorMessage, context, duration: Toast.LENGTH_LONG, gravity:  Toast.BOTTOM);
+      setSpinnerStatus(false);
+    }
+  }
+
+  void _getMiInfo(String idPropio) async {
+
+    final messages = await QuerysService().getMiInfo(miId: idPropio);
+    usuarios = _getUserItem(messages.documents);
+
+    if(usuarios.length > 0){
+
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+              builder: (context) => MainScreen (adminModel: usuarios[0])
+          )
+      );
+      setSpinnerStatus(false);
+
+    }
+    else{
+      Authentication().singOut();
+      setSpinnerStatus(false);
+      Toast.show("Ha ocurrido un error, por favor reinicie la aplicación", context, duration: Toast.LENGTH_LONG);
+    }
+  }
+
+  List<AdminModel> _getUserItem(dynamic miInfo){
+
+    List<AdminModel> miInfoList = [];
+
+    for(var datos in miInfo) {
+      final id_ = datos.data['id'];
+      final name_ = datos.data['name'] ?? '';
+      final lastName_ = datos.data['lastName'] ?? '';
+      final email_ = datos.data['email'] ?? '';
+      final createdOn_ = datos.data['createdOn'];
+      final locality_ = datos.data['locality'] ?? '';
+      final state_ = datos.data['state'] ?? '';
+      final code_ = datos.data['code'] ?? '';
+
+      AdminModel usuariosModel = AdminModel(
+        id: id_,
+        name: name_,
+        email: email_,
+        createdOn: createdOn_.toDate(),
+        code: code_,
+        lastName: lastName_,
+        locality: locality_,
+        state: state_,
+      );
+
+
+      miInfoList.add(usuariosModel);
+    }
+    return miInfoList;
   }
 }
