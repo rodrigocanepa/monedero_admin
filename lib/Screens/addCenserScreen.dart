@@ -1,9 +1,15 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:monedero_admin/Firebase/authentication.dart';
 import 'package:monedero_admin/Firebase/firebase_referencias.dart';
 import 'package:monedero_admin/Firebase/querys.dart';
+import 'package:monedero_admin/Models/localitiesModel.dart';
+import 'package:monedero_admin/Models/stateModel.dart';
 import 'package:toast/toast.dart';
+import 'package:monedero_admin/MyColors/Colors.dart' as MyColors;
 
 class AddCenserScreen extends StatefulWidget {
 
@@ -30,18 +36,50 @@ class _AddCenserScreenState extends State<AddCenserScreen> {
   TextEditingController _controllerService3;
   TextEditingController _controllerService4;
   TextEditingController _controllerService5;
-  bool _showSpinner = false;
+  bool _showSpinner = true;
   String _category = "";
-  String _state = "";
-  String _locality = "";
+  String _state = "Agregar estado";
+  String _locality = "Agregar municipio";
   List<String> servicesList = [];
   List<String> photos = [];
+  List<String> categories = [];
+  List<StateModel> stateList = [];
+  List<LocalityModel> localityList = [];
+  List<LocalityModel> localityListFiltered = [];
 
+  Future<String> _loadASmaeAsset() async {
+    return await rootBundle.loadString('assets/estados.json');
+  }
+
+  loadStates() async {
+    String jsonString = await _loadASmaeAsset();
+    var jsonResponse = json.decode(jsonString) as List;
+
+    stateList = jsonResponse.map((i) => StateModel.fromJson(i)).toList();
+
+  }
+
+  Future<String> _loadLocalitiesAsset() async {
+    return await rootBundle.loadString('assets/result.json');
+  }
+
+  loadLocalities() async {
+    String jsonString = await _loadLocalitiesAsset();
+    var jsonResponse = json.decode(jsonString) as List;
+
+    localityList = jsonResponse.map((i) => LocalityModel.fromJson(i)).toList();
+
+    setState(() {
+      _showSpinner = false;
+    });
+  }
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    loadStates();
+    loadLocalities();
 
     _controllerNameCenser = TextEditingController();
     _controllerNameOwner = TextEditingController();
@@ -57,6 +95,39 @@ class _AddCenserScreenState extends State<AddCenserScreen> {
     _controllerService3 = TextEditingController();
     _controllerService4 = TextEditingController();
     _controllerService5 = TextEditingController();
+
+    categories.add("AUTOLAVADO");
+    categories.add("BAÑOS PÚBLICOS");
+    categories.add("CERRAJERÍAS");
+    categories.add("CIBER");
+    categories.add("DENTISTA");
+    categories.add("ELÉCTRICO");
+    categories.add("ELECTRICISTA");
+    categories.add("ESCUELA DE BAILE");
+    categories.add("ESCUELA DE BELLEZA");
+    categories.add("ESCUELA DE DANZA");
+    categories.add("ESCUELA DE IDIOMAS");
+    categories.add("ESCUELA DE NATACIÓN");
+    categories.add("ESTACIONAMIENTO");
+    categories.add("ESTÉTICA");
+    categories.add("GIMNASIO");
+    categories.add("JARDINERO");
+    categories.add("LABORATORIO CLÍNICO");
+    categories.add("LAVANDERÍAS");
+    categories.add("LUSTADOR DE ZAPATOS");
+    categories.add("MECÁNICO AUTOMOTRIZ");
+    categories.add("MÉDICO");
+    categories.add("MODISTA");
+    categories.add("ÓPTICAS");
+    categories.add("PINTOR");
+    categories.add("PLOMERO");
+    categories.add("REPARACIÓN DE CALZADO");
+    categories.add("SPA");
+    categories.add("TALLER DE BICICLETAS");
+    categories.add("TÉCNICO EN REPARACIÓN DE CELULARES");
+    categories.add("TÉCNICO EN REPARACIÓN DE ELECTRODOMÉSTICOS");
+    categories.add("VETERINARIO");
+    categories.add("VULCANIZADORA");
   }
 
   @override
@@ -111,24 +182,34 @@ class _AddCenserScreenState extends State<AddCenserScreen> {
                             color: Colors.grey[300],
                             borderRadius: BorderRadius.circular(10.0)
                         ),
-                        child: Text(
-                            ""
+                        child: Center(
+                          child: Text(
+                              _category,
+                            style: TextStyle(
+                              color: MyColors.Colors.colorBackgroundDark
+                            ),
+                          ),
                         ),
                       ),
                     ),
                     SizedBox(
                       width: 10.0,
                     ),
-                    Container(
-                      height: 40.0,
-                      width: 90.0,
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10.0),
-                          color: Colors.grey[300]
-                      ),
-                      child: Center(
-                        child: Text(
-                            "Agregar"
+                    GestureDetector(
+                      onTap: (){
+                        _showCategories();
+                      },
+                      child: Container(
+                        height: 40.0,
+                        width: 90.0,
+                        decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(10.0),
+                            color: Colors.grey[300]
+                        ),
+                        child: Center(
+                          child: Text(
+                              "Agregar"
+                          ),
                         ),
                       ),
                     ),
@@ -158,7 +239,7 @@ class _AddCenserScreenState extends State<AddCenserScreen> {
                       //obscureText: true,
                       style: TextStyle(
                         fontFamily: 'Futura',
-                        color: Colors.black45,
+                          color: MyColors.Colors.colorBackgroundDark
                       ),
                       decoration: InputDecoration(
                           border: InputBorder.none,
@@ -190,7 +271,7 @@ class _AddCenserScreenState extends State<AddCenserScreen> {
                       //obscureText: true,
                       style: TextStyle(
                         fontFamily: 'Futura',
-                        color: Colors.black45,
+                          color: MyColors.Colors.colorBackgroundDark
                       ),
                       decoration: InputDecoration(
                           border: InputBorder.none,
@@ -221,7 +302,7 @@ class _AddCenserScreenState extends State<AddCenserScreen> {
                       //obscureText: true,
                       style: TextStyle(
                         fontFamily: 'Futura',
-                        color: Colors.black45,
+                          color: MyColors.Colors.colorBackgroundDark
                       ),
                       decoration: InputDecoration(
                           border: InputBorder.none,
@@ -253,7 +334,7 @@ class _AddCenserScreenState extends State<AddCenserScreen> {
                       //obscureText: true,
                       style: TextStyle(
                         fontFamily: 'Futura',
-                        color: Colors.black45,
+                          color: MyColors.Colors.colorBackgroundDark
                       ),
                       decoration: InputDecoration(
                           border: InputBorder.none,
@@ -282,10 +363,11 @@ class _AddCenserScreenState extends State<AddCenserScreen> {
                       textInputAction: TextInputAction.done,
                       controller: _controllerDescription,
                       textCapitalization: TextCapitalization.sentences,
+                      maxLines: 3,
                       //obscureText: true,
                       style: TextStyle(
                         fontFamily: 'Futura',
-                        color: Colors.black45,
+                          color: MyColors.Colors.colorBackgroundDark
                       ),
                       decoration: InputDecoration(
                           border: InputBorder.none,
@@ -305,15 +387,23 @@ class _AddCenserScreenState extends State<AddCenserScreen> {
                 Row(
                   children: <Widget>[
                     Expanded(
-                      child: Container(
-                        height: 40.0,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10.0),
-                            color: Colors.grey[300]
-                        ),
-                        child: Center(
-                          child: Text(
-                              "Agregar estado"
+                      child: GestureDetector(
+                        onTap: (){
+                          _showStatesDialog();
+                        },
+                        child: Container(
+                          height: 40.0,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0),
+                              color: Colors.grey[300]
+                          ),
+                          child: Center(
+                            child: Text(
+                                _state,
+                              style: TextStyle(
+                                  color: MyColors.Colors.colorBackgroundDark
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -322,15 +412,28 @@ class _AddCenserScreenState extends State<AddCenserScreen> {
                       width: 10.0,
                     ),
                     Expanded(
-                      child: Container(
-                        height: 40.0,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10.0),
-                            color: Colors.grey[300]
-                        ),
-                        child: Center(
-                          child: Text(
-                              "Agregar municipio"
+                      child: GestureDetector(
+                        onTap: (){
+                          if(_state == "Agregar estado"){
+                            Toast.show("Debes seleccionar el estado primero", context, duration: Toast.LENGTH_LONG);
+                          }
+                          else{
+                            _showLocalitiesDialog();
+                          }
+                        },
+                        child: Container(
+                          height: 40.0,
+                          decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10.0),
+                              color: Colors.grey[300]
+                          ),
+                          child: Center(
+                            child: Text(
+                                _locality,
+                              style: TextStyle(
+                                  color: MyColors.Colors.colorBackgroundDark
+                              ),
+                            ),
                           ),
                         ),
                       ),
@@ -361,7 +464,7 @@ class _AddCenserScreenState extends State<AddCenserScreen> {
                       //obscureText: true,
                       style: TextStyle(
                         fontFamily: 'Futura',
-                        color: Colors.black45,
+                          color: MyColors.Colors.colorBackgroundDark
                       ),
                       decoration: InputDecoration(
                           border: InputBorder.none,
@@ -393,7 +496,7 @@ class _AddCenserScreenState extends State<AddCenserScreen> {
                       //obscureText: true,
                       style: TextStyle(
                         fontFamily: 'Futura',
-                        color: Colors.black45,
+                          color: MyColors.Colors.colorBackgroundDark
                       ),
                       decoration: InputDecoration(
                           border: InputBorder.none,
@@ -425,7 +528,7 @@ class _AddCenserScreenState extends State<AddCenserScreen> {
                       //obscureText: true,
                       style: TextStyle(
                         fontFamily: 'Futura',
-                        color: Colors.black45,
+                          color: MyColors.Colors.colorBackgroundDark
                       ),
                       decoration: InputDecoration(
                           border: InputBorder.none,
@@ -454,10 +557,11 @@ class _AddCenserScreenState extends State<AddCenserScreen> {
                       textInputAction: TextInputAction.done,
                       controller: _controllerHours,
                       textCapitalization: TextCapitalization.sentences,
+                      maxLines: 3,
                       //obscureText: true,
                       style: TextStyle(
                         fontFamily: 'Futura',
-                        color: Colors.black45,
+                          color: MyColors.Colors.colorBackgroundDark
                       ),
                       decoration: InputDecoration(
                           border: InputBorder.none,
@@ -489,7 +593,7 @@ class _AddCenserScreenState extends State<AddCenserScreen> {
                       //obscureText: true,
                       style: TextStyle(
                         fontFamily: 'Futura',
-                        color: Colors.black45,
+                          color: MyColors.Colors.colorBackgroundDark
                       ),
                       decoration: InputDecoration(
                           border: InputBorder.none,
@@ -520,7 +624,7 @@ class _AddCenserScreenState extends State<AddCenserScreen> {
                       textCapitalization: TextCapitalization.sentences,
                       style: TextStyle(
                         fontFamily: 'Futura',
-                        color: Colors.black45,
+                          color: MyColors.Colors.colorBackgroundDark
                       ),
                       decoration: InputDecoration(
                           border: InputBorder.none,
@@ -551,7 +655,7 @@ class _AddCenserScreenState extends State<AddCenserScreen> {
                       textCapitalization: TextCapitalization.sentences,
                       style: TextStyle(
                         fontFamily: 'Futura',
-                        color: Colors.black45,
+                          color: MyColors.Colors.colorBackgroundDark
                       ),
                       decoration: InputDecoration(
                           border: InputBorder.none,
@@ -582,7 +686,7 @@ class _AddCenserScreenState extends State<AddCenserScreen> {
                       textCapitalization: TextCapitalization.sentences,
                       style: TextStyle(
                         fontFamily: 'Futura',
-                        color: Colors.black45,
+                          color: MyColors.Colors.colorBackgroundDark
                       ),
                       decoration: InputDecoration(
                           border: InputBorder.none,
@@ -613,7 +717,7 @@ class _AddCenserScreenState extends State<AddCenserScreen> {
                       textCapitalization: TextCapitalization.sentences,
                       style: TextStyle(
                         fontFamily: 'Futura',
-                        color: Colors.black45,
+                          color: MyColors.Colors.colorBackgroundDark
                       ),
                       decoration: InputDecoration(
                           border: InputBorder.none,
@@ -783,4 +887,203 @@ class _AddCenserScreenState extends State<AddCenserScreen> {
       _showSpinner = status;
     });
   }
+
+  void _showCategories(){
+    AlertDialog alertDialog = AlertDialog(
+      title: Text(
+        "CATEGORÍAS",
+        style: TextStyle(
+          fontFamily: 'Barlow',
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      content: ListView.builder(
+          itemCount: categories.length,
+          itemBuilder: (BuildContext ctxt, int index) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: GestureDetector(
+                onTap: (){
+                  setState(() {
+                    _category = categories[index];
+                    Navigator.of(context).pop();
+                  });
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Text(
+                      categories[index]
+                    ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    Container(
+                      height: 1.0,
+                      color: Colors.black26,
+                    )
+                  ],
+                ),
+              ),
+            );
+          }
+      ),
+      actions: <Widget>[
+        FlatButton(
+          child: Text(
+            "Cancelar",
+            style: TextStyle(
+              fontSize: 16.0,
+              color: MyColors.Colors.colorBackgroundDark,
+              fontFamily: 'Barlow',
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    );
+
+    showDialog(context: context, builder: (BuildContext context){
+      return alertDialog;
+    });
+  }
+
+  void _showStatesDialog(){
+    AlertDialog alertDialog = AlertDialog(
+      title: Text(
+        "ESTADOS",
+        style: TextStyle(
+          fontFamily: 'Barlow',
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      content: ListView.builder(
+          itemCount: stateList.length,
+          itemBuilder: (BuildContext ctxt, int index) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: GestureDetector(
+                onTap: (){
+                  setState(() {
+                    _state = stateList[index].nombre;
+                    _locality = "Agregar municipio";
+
+                    localityListFiltered.clear();
+                    for(int i = 0; i < localityList.length; i++){
+                      if(localityList[i].nombre_estado == _state){
+                        localityListFiltered.add(localityList[i]);
+                      }
+                    }
+
+                    Navigator.of(context).pop();
+                  });
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Text(
+                        stateList[index].nombre
+                    ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    Container(
+                      height: 1.0,
+                      color: Colors.black26,
+                    )
+                  ],
+                ),
+              ),
+            );
+          }
+      ),
+      actions: <Widget>[
+        FlatButton(
+          child: Text(
+            "Cancelar",
+            style: TextStyle(
+              fontSize: 16.0,
+              color: MyColors.Colors.colorBackgroundDark,
+              fontFamily: 'Barlow',
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    );
+
+    showDialog(context: context, builder: (BuildContext context){
+      return alertDialog;
+    });
+  }
+
+  void _showLocalitiesDialog(){
+    AlertDialog alertDialog = AlertDialog(
+      title: Text(
+        "MUNICIPIOS",
+        style: TextStyle(
+          fontFamily: 'Barlow',
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      content: ListView.builder(
+          itemCount: localityListFiltered.length,
+          itemBuilder: (BuildContext ctxt, int index) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: GestureDetector(
+                onTap: (){
+                  setState(() {
+                    _locality = localityListFiltered[index].nombre_municipio;
+                    Navigator.of(context).pop();
+                  });
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Text(
+                        localityListFiltered[index].nombre_municipio
+                    ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    Container(
+                      height: 1.0,
+                      color: Colors.black26,
+                    )
+                  ],
+                ),
+              ),
+            );
+          }
+      ),
+      actions: <Widget>[
+        FlatButton(
+          child: Text(
+            "Cancelar",
+            style: TextStyle(
+              fontSize: 16.0,
+              color: MyColors.Colors.colorBackgroundDark,
+              fontFamily: 'Barlow',
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    );
+
+    showDialog(context: context, builder: (BuildContext context){
+      return alertDialog;
+    });
+  }
+
 }
