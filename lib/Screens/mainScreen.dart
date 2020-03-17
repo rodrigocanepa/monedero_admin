@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:monedero_admin/Firebase/authentication.dart';
 import 'package:monedero_admin/Models/adminModel.dart';
 import 'package:monedero_admin/Screens/censersScreen.dart';
+import 'package:monedero_admin/Screens/loginScreen.dart';
 import 'package:monedero_admin/Screens/usersScreen.dart';
 import 'package:monedero_admin/MyColors/Colors.dart' as MyColors;
 
@@ -70,20 +72,25 @@ class _MainScreenState extends State<MainScreen> {
           SizedBox(
             height: 10.0,
           ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width/4),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.circular(20.0),
-              ),
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Center(
-                  child: Text(
-                    "Cerrar Sesión",
-                    style: TextStyle(
-                      color: Colors.white
+          GestureDetector(
+            onTap: (){
+              _showAlertCerrarSesion();
+            },
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width/4),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.circular(20.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Center(
+                    child: Text(
+                      "Cerrar Sesión",
+                      style: TextStyle(
+                        color: Colors.white
+                      ),
                     ),
                   ),
                 ),
@@ -175,12 +182,12 @@ class _MainScreenState extends State<MainScreen> {
             flex: 1,
             child: GestureDetector(
               onTap: (){
-                Navigator.push(
+                /*Navigator.push(
                     context,
                     MaterialPageRoute(
                         builder: (context) => CensersScreen()
                     )
-                );
+                );*/
               },
               child: Padding(
                 padding: const EdgeInsets.only(top:20.0, left: 40.0, right: 40.0, bottom: 5.0),
@@ -214,4 +221,64 @@ class _MainScreenState extends State<MainScreen> {
 
     );
   }
+
+  void _showAlertCerrarSesion(){
+    AlertDialog alertDialog = AlertDialog(
+      title: Text(
+        "Cerrar Sesión",
+        style: TextStyle(
+          fontFamily: 'Barlow',
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      content: Text(
+        "¿Está seguro de querer cerrar sesión?",
+        style: TextStyle(
+          fontFamily: 'Barlow',
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      actions: <Widget>[
+        FlatButton(
+          child: Text(
+            "Cancelar",
+            style: TextStyle(
+              fontSize: 16.0,
+              color: MyColors.Colors.colorBackgroundDark,
+              fontFamily: 'Barlow',
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        FlatButton(
+          child: Text(
+            "Aceptar",
+            style: TextStyle(
+              fontSize: 16.0,
+              color: MyColors.Colors.colorBackgroundDark,
+              fontFamily: 'Barlow',
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          onPressed: () {
+            Authentication().singOut();
+            Navigator.of(context).pop();
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => LoginScreen ()
+                ));
+          },
+        ),
+      ],
+    );
+
+    showDialog(context: context, builder: (BuildContext context){
+      return alertDialog;
+    });
+  }
+
 }

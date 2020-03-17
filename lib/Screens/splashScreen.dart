@@ -38,6 +38,7 @@ class _SplashScreenState extends State<SplashScreen> {
       });
     }
     else{
+      Authentication().singOut();
       Timer(
           Duration(
               milliseconds: 1000
@@ -87,6 +88,19 @@ class _SplashScreenState extends State<SplashScreen> {
     var user = await Authentication().getCurrentUser();
     if (user != null) {
       _getMiInfo(user.uid);
+    }
+    else{
+      Timer(
+          Duration(
+              milliseconds: 1000
+          ), () {
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(
+                builder: (context) => LoginScreen()
+            )
+        );
+      });
     }
   }
 

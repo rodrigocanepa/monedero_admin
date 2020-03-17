@@ -13,7 +13,7 @@ class CensersScreen extends StatefulWidget {
 
 class _CensersScreenState extends State<CensersScreen> {
 
-  bool _showSpinner = false;
+  bool _showSpinner = true;
   List<CenserModel> censers = [];
 
   void _getCensers() async {
@@ -45,8 +45,8 @@ class _CensersScreenState extends State<CensersScreen> {
       final category_ = datos.data['category'] ?? '';
       final addres_ = datos.data['addres'] ?? '';
       final openHours_ = datos.data['openHours'] ?? '';
-      final latitude_ = datos.data['latitude'] ?? '';
-      final longitude_ = datos.data['longitude'] ?? '';
+      final latitude_ = datos.data['latitude'];
+      final longitude_ = datos.data['longitude'];
       final state_ = datos.data['state'] ?? '';
       final locality_ = datos.data['locality'] ?? '';
       final nameOwner_ = datos.data['nameOwner'] ?? '';
@@ -202,6 +202,7 @@ class _CensersScreenState extends State<CensersScreen> {
                 ),
               ],
             ),
+            _censersList()
           ],
         ),
       ),
@@ -210,7 +211,9 @@ class _CensersScreenState extends State<CensersScreen> {
           Navigator.push(
               context,
               MaterialPageRoute(
-                  builder: (context) => AddCenserScreen()
+                  builder: (context) => AddCenserScreen(
+                    function: _reloadData,
+                  )
               )
           );
         },
@@ -220,7 +223,7 @@ class _CensersScreenState extends State<CensersScreen> {
     );
   }
 
-  Widget _usersList(){
+  Widget _censersList(){
 
     if(censers.length > 0){
       return MediaQuery.removePadding(
@@ -230,7 +233,7 @@ class _CensersScreenState extends State<CensersScreen> {
           child: ListView.builder(
               itemCount: censers.length,
               itemBuilder: (BuildContext ctxt, int index) {
-                return CenserItem(censerModel: censers[index]);
+                return CenserItem(censerModel: censers[index], function: _reloadData);
               }
           ),
         ),

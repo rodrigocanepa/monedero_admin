@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:monedero_admin/Models/CenserModel.dart';
+import 'package:monedero_admin/Screens/editCenserScreen.dart';
 
 class CenserItem extends StatefulWidget {
 
   CenserModel censerModel;
-  CenserItem({this.censerModel});
+  Function function;
+  CenserItem({this.censerModel, this.function});
 
   @override
   _CenserItemState createState() => _CenserItemState();
@@ -30,11 +32,11 @@ class _CenserItemState extends State<CenserItem> {
       padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 8.0),
       child: GestureDetector(
         onTap: (){
-          /*Navigator.push(
+          Navigator.push(
               this.context,
               MaterialPageRoute(
-              builder: (context) => DetallesUsuarioScreen (usuariosModel: widget.usuariosModel))
-          );*/
+              builder: (context) => EditCenserScreen (censerModel: widget.censerModel, function: widget.function))
+          );
         },
         child: Container(
           child: Row(
@@ -58,7 +60,8 @@ class _CenserItemState extends State<CenserItem> {
                     Text(
                       widget.censerModel.name,
                       style: TextStyle(
-                          fontWeight: FontWeight.bold
+                          fontWeight: FontWeight.bold,
+                        fontSize: 18.0
                       ),
                     ),
                     Text(

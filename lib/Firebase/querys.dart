@@ -77,5 +77,17 @@ class QuerysService{
     return url;
   }
 
+  void updateFotosEstablecimientoData({String idEstablecimiento, BuildContext context, List<String> collectionValues}) async{
+    bool error = false;
+    await _fireStore.collection(FirebaseReferencias.REFERENCE_CENSERS).document(idEstablecimiento).updateData({"photos": collectionValues}).catchError((onError){
+      Toast.show("Ha ocurrido un error, por favor, intente de nuevo", context, duration: Toast.LENGTH_LONG);
+      error = true;
+    }).then((onValue){
+      if(!error){
+        Toast.show("¡Información actualizada exitosamente!", context, duration: Toast.LENGTH_LONG);
+      }
+    });
+  }
+
 
 }
