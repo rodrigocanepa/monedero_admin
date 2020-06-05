@@ -479,6 +479,7 @@ class _EditCenserScreenState extends State<EditCenserScreen> {
                               style: TextStyle(
                                   color: MyColors.Colors.colorBackgroundDark
                               ),
+                              textAlign: TextAlign.center,
                             ),
                           ),
                         ),
@@ -509,6 +510,7 @@ class _EditCenserScreenState extends State<EditCenserScreen> {
                               style: TextStyle(
                                   color: MyColors.Colors.colorBackgroundDark
                               ),
+                              textAlign: TextAlign.center,
                             ),
                           ),
                         ),
@@ -820,6 +822,37 @@ class _EditCenserScreenState extends State<EditCenserScreen> {
                       child: Center(
                         child: Text(
                           "Actualizar Información",
+                          style: TextStyle(
+                              color: Colors.white
+                          ),
+                        ),
+                      )
+                  ),
+                ),
+                SizedBox(
+                  height: 15.0,
+                ),
+                GestureDetector(
+                  onTap: (){
+                    if(widget.censerModel.suspended){
+                      setState(() {
+                        QuerysService().UpdateSuspendedFalseCenser(idCenser: widget.censerModel.id);
+                        widget.censerModel.suspended = false;
+                      });
+                    }
+                    else{
+                      _showAlertSuspender();
+                    }
+                  },
+                  child: Container(
+                      height: 40.0,
+                      decoration: BoxDecoration(
+                          color: widget.censerModel.suspended ? Colors.blue : Colors.red,
+                          borderRadius: BorderRadius.circular(10.0)
+                      ),
+                      child: Center(
+                        child: Text(
+                          widget.censerModel.suspended ? "Reactivar usuario" : "Suspender centro de servicio",
                           style: TextStyle(
                               color: Colors.white
                           ),
@@ -1261,7 +1294,7 @@ class _EditCenserScreenState extends State<EditCenserScreen> {
           isUploaded1 = true;
         }
         else{
-          imagesNetwork[0] = "";
+          imagesNetwork[0] = "https://firebasestorage.googleapis.com/v0/b/mega-monedero.appspot.com/o/photo_default.jpg?alt=media&token=02df7823-7d9d-42d2-84c9-218eca5b9c74";
           isUploaded1 = false;
         }
       }
@@ -1270,7 +1303,7 @@ class _EditCenserScreenState extends State<EditCenserScreen> {
           isUploaded2= true;
         }
         else{
-          imagesNetwork[1] = "";
+          imagesNetwork[1] = "https://firebasestorage.googleapis.com/v0/b/mega-monedero.appspot.com/o/photo_default.jpg?alt=media&token=02df7823-7d9d-42d2-84c9-218eca5b9c74";
           isUploaded2 = false;
         }
       }
@@ -1279,7 +1312,7 @@ class _EditCenserScreenState extends State<EditCenserScreen> {
           isUploaded3 = true;
         }
         else{
-          imagesNetwork[2] = "";
+          imagesNetwork[2] = "https://firebasestorage.googleapis.com/v0/b/mega-monedero.appspot.com/o/photo_default.jpg?alt=media&token=02df7823-7d9d-42d2-84c9-218eca5b9c74";
           isUploaded3 = false;
         }
       }
@@ -1288,5 +1321,61 @@ class _EditCenserScreenState extends State<EditCenserScreen> {
     });
   }
 
+  void _showAlertSuspender(){
+    AlertDialog alertDialog = AlertDialog(
+      title: Text(
+        "Suspender Censer",
+        style: TextStyle(
+          fontFamily: 'Barlow',
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      content: Text(
+        "¿Está seguro de querer suspender este censer? Al hacerlo el censer dejará de aparecer en el mapa y también no tendrá la posibilidad de escanear ni dar de alta algún código",
+        style: TextStyle(
+          fontFamily: 'Barlow',
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      actions: <Widget>[
+        FlatButton(
+          child: Text(
+            "Cancelar",
+            style: TextStyle(
+              fontSize: 16.0,
+              color: MyColors.Colors.colorBackgroundDark,
+              fontFamily: 'Barlow',
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+        FlatButton(
+          child: Text(
+            "Aceptar",
+            style: TextStyle(
+              fontSize: 16.0,
+              color: MyColors.Colors.colorBackgroundDark,
+              fontFamily: 'Barlow',
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          onPressed: () {
+            QuerysService().UpdateSuspendedTrueCenser(idCenser: widget.censerModel.id);
+            setState(() {
+              widget.censerModel.suspended = true;
+            });
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    );
+
+    showDialog(context: context, builder: (BuildContext context){
+      return alertDialog;
+    });
+  }
 
 }

@@ -22,6 +22,17 @@ class _UserItemState extends State<UserItem> {
     // TODO: implement initState
     super.initState();
     formattedDate = DateFormat('yyyy-MM-dd – kk:mm').format(widget.userModel.createdOn);
+
+    DateTime now = DateTime.now();
+    int isActive = now.compareTo(widget.userModel.activeUntil);
+
+    if(isActive == 1){
+      print("Usuario inactivo");
+      active = false;
+    }
+    else{
+      active = true;
+    }
   }
 
   @override
@@ -43,7 +54,7 @@ class _UserItemState extends State<UserItem> {
                 flex: 1,
                 child: CircleAvatar(
                   child: Text(
-                      widget.userModel.name[0] + widget.userModel.lastName[0]
+                      widget.userModel.name[0]
                   ),
                 ),
               ),
@@ -56,7 +67,7 @@ class _UserItemState extends State<UserItem> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: <Widget>[
                     Text(
-                      widget.userModel.name + " " + widget.userModel.lastName,
+                      widget.userModel.name,
                       style: TextStyle(
                           fontWeight: FontWeight.bold
                       ),
@@ -65,7 +76,7 @@ class _UserItemState extends State<UserItem> {
                         widget.userModel.email
                     ),
                     Text(
-                      active ? "Vigente" : "No vigente",
+                      active ? "Vigente hasta el " + DateFormat('yyyy-MM-dd').format(widget.userModel.activeUntil)  : "No vigente",
                       style: TextStyle(
                         color: active ? Color.fromARGB(255, 24, 148, 206) : Colors.red,
 

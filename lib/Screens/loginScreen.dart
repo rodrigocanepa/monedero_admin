@@ -2,6 +2,7 @@ import 'package:clippy_flutter/diagonal.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
+import 'package:monedero_admin/Dialog/dialogResetContrasena.dart';
 import 'package:monedero_admin/Firebase/authentication.dart';
 import 'package:monedero_admin/Firebase/querys.dart';
 import 'package:monedero_admin/Models/adminModel.dart';
@@ -193,15 +194,25 @@ class _LoginScreenState extends State<LoginScreen> {
                         )
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 20.0, right: 40.0),
-                    child: Text(
-                      "¿Olvidaste tu contraseña?",
-                      style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold
+                  GestureDetector(
+                    onTap: (){
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) => DialogResetContrasena(
+                            function: _reestablecerContrasena,
+                          )
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.only(top: 20.0, right: 40.0),
+                      child: Text(
+                        "¿Olvidaste tu contraseña?",
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold
+                        ),
+                        textAlign: TextAlign.end,
                       ),
-                      textAlign: TextAlign.end,
                     ),
                   ),
                   GestureDetector(
@@ -332,5 +343,10 @@ class _LoginScreenState extends State<LoginScreen> {
       miInfoList.add(usuariosModel);
     }
     return miInfoList;
+  }
+
+  void _reestablecerContrasena(String correo) async {
+    await Authentication().resetPassword(email: correo);
+    Toast.show("Se ha enviado un correo electrónico al email que escribiste, ahí podrás reestablecer tu contraseña", context, duration: 8, gravity:  Toast.BOTTOM);
   }
 }

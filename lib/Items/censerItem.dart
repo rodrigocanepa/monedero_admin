@@ -76,7 +76,7 @@ class _CenserItemState extends State<CenserItem> {
                     Text(
                       !widget.censerModel.suspended ? "Activo" : "Suspendido",
                       style: TextStyle(
-                        color: active ? Color.fromARGB(255, 24, 148, 206) : Colors.red,
+                        color: !widget.censerModel.suspended ? Color.fromARGB(255, 24, 148, 206) : Colors.red,
 
                       ),
                     ),

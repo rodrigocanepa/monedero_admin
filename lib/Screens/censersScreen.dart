@@ -1,10 +1,16 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:modal_progress_hud/modal_progress_hud.dart';
 import 'package:monedero_admin/Firebase/querys.dart';
 import 'package:monedero_admin/Items/censerItem.dart';
 import 'package:monedero_admin/Models/CenserModel.dart';
+import 'package:monedero_admin/Models/localitiesModel.dart';
+import 'package:monedero_admin/Models/stateModel.dart';
 import 'package:monedero_admin/Screens/addCenserScreen.dart';
 import 'package:toast/toast.dart';
+import 'package:monedero_admin/MyColors/Colors.dart' as MyColors;
 
 class CensersScreen extends StatefulWidget {
   @override
@@ -15,6 +21,95 @@ class _CensersScreenState extends State<CensersScreen> {
 
   bool _showSpinner = true;
   List<CenserModel> censers = [];
+  List<StateModel> stateList = [];
+  List<LocalityModel> localityList = [];
+  List<LocalityModel> localityListFiltered = [];
+  TextEditingController _controllerEmail;
+  String _state = "Agregar estado";
+  String _locality = "Agregar municipio";
+
+
+
+  Future<String> _loadASmaeAsset() async {
+    return await rootBundle.loadString('assets/estados.json');
+  }
+
+  loadStates() async {
+    String jsonString = await _loadASmaeAsset();
+    var jsonResponse = json.decode(jsonString) as List;
+
+    stateList = jsonResponse.map((i) => StateModel.fromJson(i)).toList();
+
+  }
+
+  Future<String> _loadLocalitiesAsset() async {
+    return await rootBundle.loadString('assets/result.json');
+  }
+
+  loadLocalities() async {
+    String jsonString = await _loadLocalitiesAsset();
+    var jsonResponse = json.decode(jsonString) as List;
+
+    localityList = jsonResponse.map((i) => LocalityModel.fromJson(i)).toList();
+
+    setState(() {
+      _showSpinner = false;
+    });
+  }
+
+  void _getCensersByEmail({String email}) async {
+
+    setSpinnerStatus(true);
+
+    final messages = await QuerysService().getCensersByEmail(email: email);
+    censers = _getCenserItem(messages.documents);
+
+    if(censers.length > 0){
+
+      setSpinnerStatus(false);
+
+    }
+    else{
+      setSpinnerStatus(false);
+      Toast.show("No se han encontrado censers", context, duration: Toast.LENGTH_LONG);
+    }
+  }
+
+  void _getCensersByState({String state}) async {
+
+    setSpinnerStatus(true);
+
+    final messages = await QuerysService().getCensersByState(state: state);
+    censers = _getCenserItem(messages.documents);
+
+    if(censers.length > 0){
+
+      setSpinnerStatus(false);
+
+    }
+    else{
+      setSpinnerStatus(false);
+      Toast.show("No se han encontrado censers", context, duration: Toast.LENGTH_LONG);
+    }
+  }
+
+  void _getCensersByStateAndCity({String state, String city}) async {
+
+    setSpinnerStatus(true);
+
+    final messages = await QuerysService().getCensersByStateAndCity(state: state, city: city);
+    censers = _getCenserItem(messages.documents);
+
+    if(censers.length > 0){
+
+      setSpinnerStatus(false);
+
+    }
+    else{
+      setSpinnerStatus(false);
+      Toast.show("No se han encontrado censers", context, duration: Toast.LENGTH_LONG);
+    }
+  }
 
   void _getCensers() async {
 
@@ -95,6 +190,16 @@ class _CensersScreenState extends State<CensersScreen> {
     // TODO: implement initState
     super.initState();
     _getCensers();
+    loadStates();
+    loadLocalities();
+    _controllerEmail = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    _controllerEmail.dispose();
   }
 
 
@@ -125,9 +230,9 @@ class _CensersScreenState extends State<CensersScreen> {
               height: 15.0,
             ),
             Text(
-              "Filtrar por municipio",
+              "Filtrar por ubicación",
               style: TextStyle(
-                  fontSize: 16.0,
+                  fontSize: 14.0,
                   fontWeight: FontWeight.bold
               ),
               textAlign: TextAlign.center,
@@ -135,28 +240,107 @@ class _CensersScreenState extends State<CensersScreen> {
             SizedBox(
               height: 5.0,
             ),
-            Container(
-              height: 40.0,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                  color: Colors.blue
-              ),
-              child: Center(
-                child: Text(
-                  "Seleccione un municipio",
-                  style: TextStyle(
-                      color: Colors.white
+            Row(
+              children: <Widget>[
+                SizedBox(
+                  width: 10.0,
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: (){
+                      _showStatesDialog();
+                    },
+                    child: Container(
+                      height: 40.0,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10.0),
+                          color: Colors.grey[300]
+                      ),
+                      child: Center(
+                        child: Text(
+                          _state,
+                          style: TextStyle(
+                              color: MyColors.Colors.colorBackgroundDark
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
                   ),
                 ),
-              ),
+                SizedBox(
+                  width: 10.0,
+                ),
+                Expanded(
+                  child: GestureDetector(
+                    onTap: (){
+                      if(_state == "Agregar estado"){
+                        Toast.show("Debes seleccionar el estado primero", context, duration: Toast.LENGTH_LONG);
+                      }
+                      else{
+                        _showLocalitiesDialog();
+                      }
+                    },
+                    child: Container(
+                      height: 40.0,
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(10.0),
+                          color: Colors.grey[300]
+                      ),
+                      child: Center(
+                        child: Text(
+                          _locality,
+                          style: TextStyle(
+                              color: MyColors.Colors.colorBackgroundDark
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 10.0,
+                ),
+                GestureDetector(
+                  onTap: (){
+                    if(_locality == "Agregar municipio"){
+                      if(_state == "Agregar estado"){
+                        Toast.show("Debes seleccionar por lo menos el estado para poder buscar", context, duration: Toast.LENGTH_LONG);
+                      }
+                      else{
+                        _getCensersByState(state: _state);
+                      }
+                    }
+                    else{
+                      _getCensersByStateAndCity(state: _state, city: _locality);
+                    }
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: Colors.grey[300],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Icon(
+                          Icons.search
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 10.0,
+                )
+              ],
             ),
             SizedBox(
-              height:25.0,
+              height:15.0,
             ),
             Text(
               "Buscar por correo electrónico",
               style: TextStyle(
-                  fontSize: 16.0,
+                  fontSize: 14.0,
                   fontWeight: FontWeight.bold
               ),
               textAlign: TextAlign.center,
@@ -168,7 +352,7 @@ class _CensersScreenState extends State<CensersScreen> {
                     padding: const EdgeInsets.only(left: 30.0, right: 10.0),
                     child: TextFormField(
                       textInputAction: TextInputAction.done,
-                      //controller: _passwordController,
+                      controller: _controllerEmail,
                       //obscureText: true,
                       style: TextStyle(
                         fontFamily: 'Futura',
@@ -185,15 +369,26 @@ class _CensersScreenState extends State<CensersScreen> {
                     ),
                   ),
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10.0),
-                    color: Colors.grey[400],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(5.0),
-                    child: Icon(
-                        Icons.search
+                GestureDetector(
+                  onTap: (){
+                    FocusScope.of(context).requestFocus(FocusNode());
+                    if(_controllerEmail.text.contains("@")){
+                      _getCensersByEmail(email: _controllerEmail.text.trim());
+                    }
+                    else{
+                      Toast.show("Introduce un correo válido", context, duration: Toast.LENGTH_LONG);
+                    }
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10.0),
+                      color: Colors.grey[300],
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Icon(
+                          Icons.search
+                      ),
                     ),
                   ),
                 ),
@@ -247,5 +442,140 @@ class _CensersScreenState extends State<CensersScreen> {
   _reloadData(){
     censers.clear();
     _getCensers();
+  }
+
+  void _showStatesDialog(){
+    AlertDialog alertDialog = AlertDialog(
+      title: Text(
+        "ESTADOS",
+        style: TextStyle(
+          fontFamily: 'Barlow',
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      content: ListView.builder(
+          itemCount: stateList.length,
+          itemBuilder: (BuildContext ctxt, int index) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: GestureDetector(
+                onTap: (){
+                  setState(() {
+                    _state = stateList[index].nombre;
+                    _locality = "Agregar municipio";
+
+                    localityListFiltered.clear();
+                    for(int i = 0; i < localityList.length; i++){
+                      if(localityList[i].nombre_estado == _state){
+                        localityListFiltered.add(localityList[i]);
+                      }
+                    }
+
+                    Navigator.of(context).pop();
+                  });
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Text(
+                        stateList[index].nombre
+                    ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    Container(
+                      height: 1.0,
+                      color: Colors.black26,
+                    )
+                  ],
+                ),
+              ),
+            );
+          }
+      ),
+      actions: <Widget>[
+        FlatButton(
+          child: Text(
+            "Cancelar",
+            style: TextStyle(
+              fontSize: 16.0,
+              color: MyColors.Colors.colorBackgroundDark,
+              fontFamily: 'Barlow',
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    );
+
+    showDialog(context: context, builder: (BuildContext context){
+      return alertDialog;
+    });
+  }
+
+  void _showLocalitiesDialog(){
+    AlertDialog alertDialog = AlertDialog(
+      title: Text(
+        "MUNICIPIOS",
+        style: TextStyle(
+          fontFamily: 'Barlow',
+          fontWeight: FontWeight.w500,
+        ),
+      ),
+      content: ListView.builder(
+          itemCount: localityListFiltered.length,
+          itemBuilder: (BuildContext ctxt, int index) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: GestureDetector(
+                onTap: (){
+                  setState(() {
+                    _locality = localityListFiltered[index].nombre_municipio;
+                    Navigator.of(context).pop();
+                  });
+                },
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: <Widget>[
+                    Text(
+                        localityListFiltered[index].nombre_municipio
+                    ),
+                    SizedBox(
+                      height: 10.0,
+                    ),
+                    Container(
+                      height: 1.0,
+                      color: Colors.black26,
+                    )
+                  ],
+                ),
+              ),
+            );
+          }
+      ),
+      actions: <Widget>[
+        FlatButton(
+          child: Text(
+            "Cancelar",
+            style: TextStyle(
+              fontSize: 16.0,
+              color: MyColors.Colors.colorBackgroundDark,
+              fontFamily: 'Barlow',
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    );
+
+    showDialog(context: context, builder: (BuildContext context){
+      return alertDialog;
+    });
   }
 }

@@ -18,11 +18,44 @@ class QuerysService{
     return await _fireStore.collection(FirebaseReferencias.REFERENCE_USERS).orderBy('createdOn', descending: true).limit(20).getDocuments();
   }
 
+  Future<QuerySnapshot> getAllUsersByState({String state}) async{
+    return await _fireStore.collection(FirebaseReferencias.REFERENCE_USERS).where('state', isEqualTo: state).orderBy('createdOn', descending: true).limit(20).getDocuments();
+  }
+
+  Future<QuerySnapshot> getAllUsersByStateAndCity({String state, String city}) async{
+    return await _fireStore.collection(FirebaseReferencias.REFERENCE_USERS).where('locality', isEqualTo: city).where('state', isEqualTo: state).orderBy('createdOn', descending: true).limit(20).getDocuments();
+  }
+
+  Future<QuerySnapshot> getAllUsersByEmail({String email}) async{
+    return await _fireStore.collection(FirebaseReferencias.REFERENCE_USERS).where('email', isEqualTo: email).getDocuments();
+  }
+
   Future<QuerySnapshot> getAllCensersByCategory({String category}) async{
     return await _fireStore.collection(FirebaseReferencias.REFERENCE_CENSERS).where('category', isEqualTo: category).where("active", isEqualTo: true).where("completed", isEqualTo: true).getDocuments();
   }
+
   Future<QuerySnapshot> getAllCensers() async{
-    return await _fireStore.collection(FirebaseReferencias.REFERENCE_CENSERS).getDocuments();
+    return await _fireStore.collection(FirebaseReferencias.REFERENCE_CENSERS).orderBy("createdOn", descending: true).limit(20).getDocuments();
+  }
+
+  Future<QuerySnapshot> getCensersByEmail({String email}) async{
+    return await _fireStore.collection(FirebaseReferencias.REFERENCE_CENSERS).where('email', isEqualTo: email).getDocuments();
+  }
+
+  Future<QuerySnapshot> getCensersByState({String state}) async{
+    return await _fireStore.collection(FirebaseReferencias.REFERENCE_CENSERS).where('state', isEqualTo: state).orderBy("createdOn", descending: true).limit(20).getDocuments();
+  }
+
+  Future<QuerySnapshot> getCensersByStateAndCity({String state, String city}) async{
+    return await _fireStore.collection(FirebaseReferencias.REFERENCE_CENSERS).where('state', isEqualTo: state).where('locality', isEqualTo: city).orderBy("createdOn", descending: true).limit(20).getDocuments();
+  }
+
+  Future<QuerySnapshot> getAllSalesByDate({DateTime fechaInicial, DateTime fechaFinal}) async{
+    return await _fireStore.collection(FirebaseReferencias.REFERENCE_EARNINGS).where('dateTime', isGreaterThanOrEqualTo: fechaInicial).where('dateTime', isLessThanOrEqualTo: fechaFinal).getDocuments();
+  }
+
+  Future<QuerySnapshot> getAllSalesByDateAndSateLocality({DateTime fechaInicial, DateTime fechaFinal, String state, String locality}) async{
+    return await _fireStore.collection(FirebaseReferencias.REFERENCE_EARNINGS).where('dateTime', isGreaterThanOrEqualTo: fechaInicial).where('dateTime', isLessThanOrEqualTo: fechaFinal).where("state", isEqualTo: state).where("locality", isEqualTo: locality).getDocuments();
   }
 
   Future<QuerySnapshot> getMiInfo({String miId}) async{
@@ -66,6 +99,14 @@ class QuerysService{
   UpdateUsuario({String collectionName, String idUsuario, Map<String, dynamic> collectionValues}) async {
     return await _fireStore.collection(collectionName).document(idUsuario).setData(collectionValues, merge: true);
     //_fireStore.collection(collectionName).document("").add(collectionValues);
+  }
+
+  UpdateSuspendedTrueCenser({String idCenser, Function function}) async {
+    return await _fireStore.collection(FirebaseReferencias.REFERENCE_CENSERS).document(idCenser).updateData({"suspended": true});
+  }
+
+  UpdateSuspendedFalseCenser({String idCenser, Function function}) async {
+    return await _fireStore.collection(FirebaseReferencias.REFERENCE_CENSERS).document(idCenser).updateData({"suspended": false});
   }
 
   Future<String> uploadProfilePhoto({File file, String id}) async {
